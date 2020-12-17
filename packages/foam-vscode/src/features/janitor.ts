@@ -85,11 +85,11 @@ async function runJanitor(foam: Foam) {
   );
 
   const dirtyNotes = notes.filter(note =>
-    dirtyEditorsFileName.includes(note.source.uri.path)
+    dirtyEditorsFileName.includes(note.uri.path)
   );
 
   const nonDirtyNotes = notes.filter(
-    note => !dirtyEditorsFileName.includes(note.source.uri.path)
+    note => !dirtyEditorsFileName.includes(note.uri.path)
   );
 
   const wikilinkSetting = getWikilinkDefinitionSetting();
@@ -125,7 +125,7 @@ async function runJanitor(foam: Foam) {
     text = definitions ? applyTextEdit(text, definitions) : text;
     text = heading ? applyTextEdit(text, heading) : text;
 
-    return fs.promises.writeFile(note.source.uri.path, text);
+    return fs.promises.writeFile(note.uri.path, text);
   });
 
   await Promise.all(fileWritePromises);
@@ -134,9 +134,7 @@ async function runJanitor(foam: Foam) {
   // edits to be applied to active text editors
   for (const doc of dirtyTextDocuments) {
     const editor = await window.showTextDocument(doc);
-    const note = dirtyNotes.find(
-      n => n.source.uri.path === editor.document.uri.path
-    )!;
+    const note = dirtyNotes.find(n => n.uri.path === editor.document.uri.path)!;
 
     // Get edits
     const heading = generateHeading(note);
